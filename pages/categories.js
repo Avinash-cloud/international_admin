@@ -200,17 +200,17 @@ function Categories({swal}) {
         <table className="w-full border-collapse border border-gray-300">
   <thead className="bg-gray-100">
     <tr>
-      <th className="px-4 py-2 text-left font-medium text-gray-700">Category name</th>
-      <th className="px-4 py-2 text-left font-medium text-gray-700">Parent category</th>
-      <th className="px-4 py-2"></th>
+      <th className="border border-gray-300 px-4 py-2 text-left font-medium text-gray-700">Category name</th>
+      <th className="border border-gray-300 px-4 py-2 text-left font-medium text-gray-700">Parent category</th>
+      <th className="border border-gray-300 px-4 py-2">Actions</th>
     </tr>
   </thead>
   <tbody>
     {categories.length > 0 && categories.map(category => (
       <tr key={category._id} className="hover:bg-gray-50">
-        <td className="px-4 py-2 text-gray-800">{category.name}</td>
-        <td className="px-4 py-2 text-gray-800">{category?.parent?.name}</td>
-        <td className="px-4 py-2 flex justify-end">
+        <td className="border border-gray-300 px-4 py-2 text-gray-800">{category.name}</td>
+        <td className=" border border-gray-300 px-4 py-2 text-gray-800">{category?.parent?.name}</td>
+        <td className=" border border-gray-300 px-4 py-2 flex justify-center">
           <button
             onClick={() => editCategory(category)}
             className="btn-default mr-2"
