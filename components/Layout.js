@@ -2,6 +2,7 @@ import { useSession, signIn, signOut } from "next-auth/react"
 import Nav from "@/components/Nav";
 import {useState} from "react";
 import Logo from "@/components/Logo";
+import Image from "next/image";
 
 export default function Layout({children}) {
   const [showNav,setShowNav] = useState(false);
@@ -18,7 +19,7 @@ export default function Layout({children}) {
 
   return (<>
     <div className="bg-teal-600 container-auto p-4">
-        Logo
+        <img src="../international-gift-logo-inline.png" width={200} height={200}/>
       </div>
     <div className="bg-bgGray min-h-screen ">
       
@@ -33,7 +34,7 @@ export default function Layout({children}) {
         </div>
       </div>
       <div className="flex">
-        <Nav show={showNav} />
+        <Nav  show={showNav} />
         <div className="flex-grow p-4 border-l-4 border-teal-600 min-h-screen  ">
           {children}
         </div>
