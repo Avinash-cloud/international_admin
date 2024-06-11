@@ -13,7 +13,7 @@ import Image from 'next/image';
 
 
 
-function banner({
+function Banner({
     _id,
 
     images: existingImages,
@@ -141,4 +141,4 @@ function banner({
     )
 }
 
-export default banner
+export default Banner

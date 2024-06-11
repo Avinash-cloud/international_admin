@@ -8,7 +8,7 @@ import Image from 'next/image';
 
 
 
-function offer() {
+function Offer() {
 
 
 
@@ -122,4 +122,4 @@ function offer() {
     )
 }
 
-export default offer
+export default Offer
