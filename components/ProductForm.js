@@ -7,35 +7,47 @@ import { ReactSortable } from "react-sortablejs";
 export default function ProductForm({
   _id,
   title: existingTitle,
-  stock: existingStock,
+  stockQuantity: existingStock,
   description: existingDescription,
   price: existingPrice,
+  discountedPrice: existingDiscountedPrice,
   images: existingImages,
   category: assignedCategory,
   properties: assignedProperties,
+  sku: existingSku
 }) {
   const [title, setTitle] = useState(existingTitle || '');
-  const [stock, setStock] = useState(existingStock || '');
-
+  const [stockQuantity, setStockQuantity] = useState(existingStock || '');
   const [description, setDescription] = useState(existingDescription || '');
   const [category, setCategory] = useState(assignedCategory || '');
   const [productProperties, setProductProperties] = useState(assignedProperties || {});
   const [price, setPrice] = useState(existingPrice || '');
+  const [discountedPrice, setDiscountedPrice] = useState(existingDiscountedPrice || '');
   const [images, setImages] = useState(existingImages || []);
+  const [sku, setSku] = useState(existingSku || '');
   const [goToProducts, setGoToProducts] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [categories, setCategories] = useState([]);
   const router = useRouter();
+  
   useEffect(() => {
     axios.get('/api/categories').then(result => {
       setCategories(result.data);
     })
   }, []);
+  
   async function saveProduct(ev) {
     ev.preventDefault();
     const data = {
-      title,stock, description, price, images, category,
-      properties: productProperties
+      title,
+      stockQuantity,
+      description,
+      price,
+      discountedPrice,
+      images,
+      category,
+      properties: productProperties,
+      sku
     };
     console.log(data)
     if (_id) {
@@ -47,9 +59,11 @@ export default function ProductForm({
     }
     setGoToProducts(true);
   }
+  
   if (goToProducts) {
     router.push('/products');
   }
+  
   async function uploadImages(ev) {
     const files = ev.target?.files;
     if (files?.length > 0) {
@@ -65,9 +79,11 @@ export default function ProductForm({
       setIsUploading(false);
     }
   }
+  
   function updateImagesOrder(images) {
     setImages(images);
   }
+  
   function setProductProp(propName, value) {
     setProductProperties(prev => {
       const newProductProps = { ...prev };
@@ -94,14 +110,24 @@ export default function ProductForm({
         type="text"
         placeholder="product name"
         value={title}
-        onChange={ev => setTitle(ev.target.value)} />
+        onChange={ev => setTitle(ev.target.value)}
+      />
 
+      <label>SKU</label>
       <input
         type="text"
-        placeholder="stock"
-        value={stock}
-        onChange={ev => setStock(ev.target.value)} />
+        placeholder="SKU"
+        value={sku}
+        onChange={ev => setSku(ev.target.value)}
+      />
 
+      <label>Stock Quantity</label>
+      <input
+        type="number"
+        placeholder="stock quantity"
+        value={stockQuantity}
+        onChange={ev => setStockQuantity(ev.target.value)}
+      />
 
       <label>Category</label>
       <select value={category}
@@ -167,6 +193,12 @@ export default function ProductForm({
         type="number" placeholder="price"
         value={price}
         onChange={ev => setPrice(ev.target.value)}
+      />
+      <label>Discounted Price (in USD)</label>
+      <input
+        type="number" placeholder="discounted price"
+        value={discountedPrice}
+        onChange={ev => setDiscountedPrice(ev.target.value)}
       />
       <button
         type="submit"
