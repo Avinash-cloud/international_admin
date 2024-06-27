@@ -52,6 +52,7 @@ export default function Products() {
             <th scope="col" className="border border-gray-300 px-4 py-3.5 text-left text-sm font-medium text-gray-500">
               Actions
             </th>
+            
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
