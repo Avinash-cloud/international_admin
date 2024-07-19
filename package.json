@@ -5,11 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build ",
-<<<<<<< HEAD
-    "start": "next start 3007",
-=======
     "start": "next start -p 3007",
->>>>>>> 7b87045 (server)
     "lint": "next lint"
   },
   "dependencies": {
