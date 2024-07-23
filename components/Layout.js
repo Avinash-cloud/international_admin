@@ -19,7 +19,7 @@ export default function Layout({children}) {
 
   return (<>
     <div className="bg-teal-600 container-auto p-4">
-        <img src="../international-gift-logo-inline.png" width={200} height={200}/>
+        <img src="../../international-gift-logo-inline.png" width={200} height={200}/>
       </div>
     <div className="bg-bgGray min-h-screen ">
       
