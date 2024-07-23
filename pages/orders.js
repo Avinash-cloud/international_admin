@@ -1,152 +1,222 @@
 import Layout from "@/components/Layout";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faDownload } from '@fortawesome/free-solid-svg-icons';
+import ReactPaginate from 'react-paginate';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export default function OrdersPage() {
-  const [orders,setOrders] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [search, setSearch] = useState("");
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [pageNumber, setPageNumber] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   useEffect(() => {
     axios.get('/api/orders').then(response => {
       setOrders(response.data);
+      setFilteredOrders(response.data);
     });
   }, []);
+
+  useEffect(() => {
+    setFilteredOrders(orders.filter(order => 
+      order.line_items.some(item => 
+        item.price_data.product_data.name.toLowerCase().includes(search.toLowerCase())
+      )
+    ));
+  }, [search, orders]);
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const handleExport = (format) => {
+    const exportData = filteredOrders.map(order => ({
+      Date: new Date(order.createdAt).toLocaleString(),
+      Paid: order.paid ? 'YES' : 'NO',
+      Name: order.name,
+      Email: order.email,
+      StreetAddress: order.streetAddress,
+      City: order.city,
+      PostalCode: order.postalCode,
+      Country: order.country,
+      Products: order.line_items.map(item => item.price_data.product_data.name).join(", "),
+      Quantity: order.line_items.map(item => item.quantity).join(", "),
+    }));
+
+    if (format === 'csv' || format === 'excel') {
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Orders");
+      const fileType = format === 'csv' ? 'csv' : 'xlsx';
+      const fileExtension = format === 'csv' ? '.csv' : '.xlsx';
+      XLSX.writeFile(wb, `Orders${fileExtension}`);
+    } else if (format === 'txt') {
+      const textContent = exportData.map(row => 
+        Object.values(row).join("\t")
+      ).join("\n");
+      const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+      saveAs(blob, 'Orders.txt');
+    }
+  };
+
+  const handlePageChange = ({ selected }) => {
+    setPageNumber(selected);
+  };
+
+  const handleRowsPerPageChange = (e) => {
+    setRowsPerPage(Number(e.target.value));
+  };
+
+  const ordersPerPage = rowsPerPage;
+  const pagesVisited = pageNumber * ordersPerPage;
+
+  const displayOrders = filteredOrders.slice(pagesVisited, pagesVisited + ordersPerPage);
+
+  const pageCount = Math.ceil(filteredOrders.length / ordersPerPage);
+
+  const generatePDF = async (order) => {
+    const doc = new jsPDF();
+    const content = `
+      <div>
+        <h1>Invoice</h1>
+        <div><strong>Date:</strong> ${new Date(order.createdAt).toLocaleString()}</div>
+        <div><strong>Name:</strong> ${order.name}</div>
+        <div><strong>Email:</strong> ${order.email}</div>
+        <div><strong>Street Address:</strong> ${order.streetAddress}</div>
+        <div><strong>City:</strong> ${order.city}</div>
+        <div><strong>Postal Code:</strong> ${order.postalCode}</div>
+        <div><strong>Country:</strong> ${order.country}</div>
+        <h2>Products</h2>
+        ${order.line_items.map(item => `
+          <div>
+            <strong>Product:</strong> ${item.price_data?.product_data.name} <br />
+            <strong>Quantity:</strong> ${item.quantity}
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    const element = document.createElement('div');
+    element.innerHTML = content;
+    document.body.appendChild(element);
+
+    const canvas = await html2canvas(element);
+    const imgData = canvas.toDataURL('image/png');
+
+    doc.addImage(imgData, 'PNG', 10, 10);
+    doc.save(`Invoice_${order._id}.pdf`);
+    document.body.removeChild(element);
+  };
+
   return (
     <Layout>
       <h1>Orders</h1>
-      {/* <table className="basic">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Paid</th>
-            <th>Recipient</th>
-            <th>Products</th>
-          </tr>
-        </thead>
-        <tbody>
-        {orders.length > 0 && orders.map(order => (
-          <tr key={order._id}>
-            <td>{(new Date(order.createdAt)).toLocaleString()}
-            </td>
-            <td className={order.paid ? 'text-green-600' : 'text-red-600'}>
-              {order.paid ? 'YES' : 'NO'}
-            </td>
-            <td>
-              {order.name} {order.email}<br />
-              {order.city} {order.postalCode} {order.country}<br />
-              {order.streetAddress}
-            </td>
-            <td>
-              {order.line_items.map(l => (
-                <>
-                  {l.price_data?.product_data.name} x
-                  {l.quantity}<br />
-                </>
-              ))}
-            </td>
-          </tr>
-        ))}
-        </tbody>
-      </table> */}
-{/* 
-<table className="border-collapse w-full">
-  <thead>
-    <tr className="bg-gray-100">
-      <th className="border border-gray-300 px-4 py-2">Date</th>
-      <th className="border border-gray-300 px-4 py-2">Paid</th>
-      <th className="border border-gray-300 px-4 py-2">Recipient</th>
-      <th className="border border-gray-300 px-4 py-2">Products</th>
-    </tr>
-  </thead>
-  <tbody>
-    {orders.length > 0 && orders.map(order => (
-    <tr key={order._id} className="border border-gray-300">
-      <td className="border border-gray-300 px-4 py-2">{(new Date(order.createdAt)).toLocaleString()}</td>
-      <td className={`border border-gray-300 px-4 py-2 ${order.paid ? 'text-green-600' : 'text-red-600'}`}>
-        {order.paid ? 'YES' : 'NO'}
-      </td>
-      <td className="border border-gray-300 px-4 py-2">
-        <div className="text-sm">{order.name} {order.email}</div>
-        <div className="text-xs">{order.city} {order.postalCode} {order.country}</div>
-        <div className="text-xs">{order.streetAddress}</div>
-      </td>
-      <td className="border border-gray-300 px-4 py-2">
-        {order.line_items.map((l, index) => (
-          <div key={index} className="text-sm">
-            {l.price_data?.product_data.name} x{l.quantity}
-          </div>
-        ))}
-      </td>
-    </tr>
-    ))}
-  </tbody>
-</table> */}
 
-<div className="overflow-x-auto">
-  <table className="border-collapse w-full">
-    <thead>
-      <tr className="bg-gray-100">
-        <th className="border border-gray-300 px-4 py-2">Date</th>
-        <th className="border border-gray-300 px-4 py-2">Image</th>
-        <th className="border border-gray-300 px-4 py-2">Paid</th>
-        <th className="border border-gray-300 px-4 py-2">Status</th>
-        <th className="border border-gray-300 px-4 py-2">Recipient</th>
-        <th className="border border-gray-300 px-4 py-2">Products</th>
-        <th className="border border-gray-300 px-4 py-2">Quantity</th>
-        <th className="border border-gray-300 px-4 py-2">Actions</th>
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by product title"
+          value={search}
+          onChange={handleSearchChange}
+          className="border px-2 py-1 rounded"
+        />
+        <button onClick={() => handleExport('csv')} className="ml-2 bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded">
+          Export CSV
+        </button>
+        <button onClick={() => handleExport('excel')} className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded">
+          Export Excel
+        </button>
+        <button onClick={() => handleExport('txt')} className="ml-2 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded">
+          Export Txt
+        </button>
+        <select onChange={handleRowsPerPageChange} value={rowsPerPage} className="ml-2 border px-2 py-1 rounded">
+          <option value={10}>10 rows</option>
+          <option value={20}>20 rows</option>
+          <option value={50}>50 rows</option>
+          <option value={100}>100 rows</option>
+        </select>
+      </div>
 
-      </tr>
-    </thead>
-    <tbody>
-      {orders.length > 0 && orders.map(order => (
-      <tr key={order._id} className="border border-gray-300">
-        <td className="border border-gray-300 px-4 py-2">{(new Date(order.createdAt)).toLocaleString()}</td>
-        <td>{order.images}</td>
-        <td className={`border border-gray-300 px-4 py-2 ${order.paid ? 'text-green-600' : 'text-red-600'}`}>
-          {order.paid ? 'YES' : 'NO'}
-        </td>
-        <td ></td>
-        <td className="border border-gray-300 px-4 py-2">
-          <div className="text-sm"><span className="font-bold">Name : </span>{order.name}</div>
-          <div className="text-xs"><span className="font-bold">Email : </span>{order.email}</div>
-          <div className="text-xs"><span className="font-bold">Sreet Address : </span>{order.streetAddress}</div>
-          <div className="text-xs"><span className="font-bold">City : </span>{order.city}</div>
-          <div className="text-xs"><span className="font-bold">postalcode : </span> {order.postalCode}</div> 
-          <div className="text-xs"><span className="font-bold">Country : </span>{order.country}</div>
-          
-        </td>
-        <td className="border border-gray-300 px-4 py-2">
-          {order.line_items.map((l, index) => (
-            <div key={index} className="text-sm">
-              {l.price_data?.product_data.name}
-            </div>
-          ))}
-        </td>
-        <td className="border border-gray-300 px-4 py-2">
-          {order.line_items.map((l, index) => (
-            <div key={index} className="text-sm">
-              {l.quantity}
-            </div>
-          ))}
-        </td>
+      <div className="overflow-x-auto">
+        <table className="border-collapse w-full">
+          <thead>
+            <tr className="bg-gray-100">
+              <th className="border border-gray-300 px-4 py-2">Date</th>
+              <th className="border border-gray-300 px-4 py-2">Image</th>
+              <th className="border border-gray-300 px-4 py-2">Paid</th>
+              <th className="border border-gray-300 px-4 py-2">Status</th>
+              <th className="border border-gray-300 px-4 py-2">Recipient</th>
+              <th className="border border-gray-300 px-4 py-2">Products</th>
+              <th className="border border-gray-300 px-4 py-2">Quantity</th>
+              <th className="border border-gray-300 px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayOrders.length > 0 && displayOrders.map(order => (
+              <tr key={order._id} className="border border-gray-300">
+                <td className="border border-gray-300 px-4 py-2">{(new Date(order.createdAt)).toLocaleString()}</td>
+                <td>{order.images}</td>
+                <td className={`border border-gray-300 px-4 py-2 ${order.paid ? 'text-green-600' : 'text-red-600'}`}>
+                  {order.paid ? 'YES' : 'NO'}
+                </td>
+                <td></td>
+                <td className="border border-gray-300 px-4 py-2">
+                  <div className="text-sm"><span className="font-bold">Name : </span>{order.name}</div>
+                  <div className="text-xs"><span className="font-bold">Email : </span>{order.email}</div>
+                  <div className="text-xs"><span className="font-bold">Street Address : </span>{order.streetAddress}</div>
+                  <div className="text-xs"><span className="font-bold">City : </span>{order.city}</div>
+                  <div className="text-xs"><span className="font-bold">Postal Code : </span> {order.postalCode}</div>
+                  <div className="text-xs"><span className="font-bold">Country : </span>{order.country}</div>
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {order.line_items.map((l, index) => (
+                    <div key={index} className="text-sm">
+                      {l.price_data?.product_data.name}
+                    </div>
+                  ))}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  {order.line_items.map((l, index) => (
+                    <div key={index} className="text-sm">
+                      {l.quantity}
+                    </div>
+                  ))}
+                </td>
+                <td className="border border-gray-300 px-4 py-2">
+                  <button className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
+                    <FontAwesomeIcon icon={faTimes} className="mr-2" />
+                    Cancel
+                  </button>
+                  <button onClick={() => generatePDF(order)} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded ml-2">
+                    <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                    Invoice
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-        <td className="border border-gray-300 px-4 py-2">
-          <button className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
-            <FontAwesomeIcon icon={faTimes} className="mr-2" />
-            Cancel
-          </button>
-          <a href={`/invoice/${order._id}`} className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded ml-2">
-            <FontAwesomeIcon icon={faDownload} className="mr-2" />
-            Invoice
-          </a>
-        </td>
-      </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
-
-
+      <ReactPaginate
+        previousLabel={'Previous'}
+        className="flex gap-6 float-right my-6 py-6"
+        nextLabel={'Next'}
+        pageCount={pageCount}
+        onPageChange={handlePageChange}
+        containerClassName={'pagination'}
+        activeClassName={'active'}
+        pageClassName={'page'}
+        previousClassName={'previous'}
+        nextClassName={'next'}
+        disabledClassName={'disabled'}
+      />
     </Layout>
   );
 }
