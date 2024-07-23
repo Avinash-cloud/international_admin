@@ -12,13 +12,52 @@ export default function Products() {
   }, []);
 
 
+  const [file, setFile] = useState(null);
+  const [message, setMessage] = useState('');
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!file) {
+      setMessage('Please select a file to upload');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch('/api/uploadcsv', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await res.json();
+    setMessage(result.message || result.error);
+  };
+
+
   console.log(products)
   return (
     <Layout>
       <Link className="btn-primary float-" href={'/products/new'}>Add new product</Link>
+
       <br />
       <br />
       <br />
+
+
+      <div>
+      <h1>Upload CSV</h1>
+      <form onSubmit={handleSubmit}>
+        <input type="file" accept=".csv" onChange={handleFileChange} />
+        <button type="submit">Upload</button>
+      </form>
+      {message && <p>{message}</p>}
+    </div>
       
 
 
