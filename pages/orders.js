@@ -24,8 +24,8 @@ export default function OrdersPage() {
   }, []);
 
   useEffect(() => {
-    setFilteredOrders(orders.filter(order => 
-      order.line_items.some(item => 
+    setFilteredOrders(orders.filter(order =>
+      order.line_items.some(item =>
         item.price_data.product_data.name.toLowerCase().includes(search.toLowerCase())
       )
     ));
@@ -57,7 +57,7 @@ export default function OrdersPage() {
       const fileExtension = format === 'csv' ? '.csv' : '.xlsx';
       XLSX.writeFile(wb, `Orders${fileExtension}`);
     } else if (format === 'txt') {
-      const textContent = exportData.map(row => 
+      const textContent = exportData.map(row =>
         Object.values(row).join("\t")
       ).join("\n");
       const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
@@ -118,7 +118,7 @@ export default function OrdersPage() {
     <Layout>
       <h1>Orders</h1>
 
-      <div className="mb-4">
+      <div className="grid mb-4 my-7 gap-5">
         <input
           type="text"
           placeholder="Search by product title"
@@ -126,15 +126,17 @@ export default function OrdersPage() {
           onChange={handleSearchChange}
           className="border px-2 py-1 rounded"
         />
-        <button onClick={() => handleExport('csv')} className="ml-2 bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded">
-          Export CSV
-        </button>
-        <button onClick={() => handleExport('excel')} className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded">
-          Export Excel
-        </button>
-        <button onClick={() => handleExport('txt')} className="ml-2 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded">
-          Export Txt
-        </button>
+        <div className=" flex gap-11 justify-center w-1/3">
+          <button onClick={() => handleExport('csv')} className="ml-2 bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded">
+            Export CSV
+          </button>
+          <button onClick={() => handleExport('excel')} className="ml-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-2 rounded">
+            Export Excel
+          </button>
+          <button onClick={() => handleExport('txt')} className="ml-2 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded">
+            Export Txt
+          </button>
+        </div>
         <select onChange={handleRowsPerPageChange} value={rowsPerPage} className="ml-2 border px-2 py-1 rounded">
           <option value={10}>10 rows</option>
           <option value={20}>20 rows</option>
