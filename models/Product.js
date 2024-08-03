@@ -33,7 +33,6 @@ const ProductSchema = new Schema({
   properties: {type:Object},
   sku: {
     type: String,
-    unique: true,
     trim: true,
     required: true
   },
