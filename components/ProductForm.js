@@ -80,9 +80,9 @@ export default function ProductForm({
     }
   }
   
-  function updateImagesOrder(images) {
-    setImages(images);
-  }
+    function updateImagesOrder(images) {
+      setImages(images);
+    }
   
   function setProductProp(propName, value) {
     setProductProperties(prev => {

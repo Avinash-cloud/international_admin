@@ -166,7 +166,7 @@ export default function Products() {
                   </div>
                 </div>
               </td>
-              <td className="whitespace-nowrap px-12 py-4 text-sm text-gray-900">{product.title}</td>
+              <td className="whitespace-nowrap px-12 py-4 text-sm text-gray-900"><a target="_blank" href={`http://www.internationalgift.in/product/${product._id}`}>{product.title}</a></td>
               <td className="px-4 py-4">
                 <div className="text-sm text-gray-500">{product.description}</div>
               </td>

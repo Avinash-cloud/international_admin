@@ -14,73 +14,7 @@ export default function OrdersPage() {
   return (
     <Layout>
       <h1>Orders</h1>
-      {/* <table className="basic">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Paid</th>
-            <th>Recipient</th>
-            <th>Products</th>
-          </tr>
-        </thead>
-        <tbody>
-        {orders.length > 0 && orders.map(order => (
-          <tr key={order._id}>
-            <td>{(new Date(order.createdAt)).toLocaleString()}
-            </td>
-            <td className={order.paid ? 'text-green-600' : 'text-red-600'}>
-              {order.paid ? 'YES' : 'NO'}
-            </td>
-            <td>
-              {order.name} {order.email}<br />
-              {order.city} {order.postalCode} {order.country}<br />
-              {order.streetAddress}
-            </td>
-            <td>
-              {order.line_items.map(l => (
-                <>
-                  {l.price_data?.product_data.name} x
-                  {l.quantity}<br />
-                </>
-              ))}
-            </td>
-          </tr>
-        ))}
-        </tbody>
-      </table> */}
-{/* 
-<table className="border-collapse w-full">
-  <thead>
-    <tr className="bg-gray-100">
-      <th className="border border-gray-300 px-4 py-2">Date</th>
-      <th className="border border-gray-300 px-4 py-2">Paid</th>
-      <th className="border border-gray-300 px-4 py-2">Recipient</th>
-      <th className="border border-gray-300 px-4 py-2">Products</th>
-    </tr>
-  </thead>
-  <tbody>
-    {orders.length > 0 && orders.map(order => (
-    <tr key={order._id} className="border border-gray-300">
-      <td className="border border-gray-300 px-4 py-2">{(new Date(order.createdAt)).toLocaleString()}</td>
-      <td className={`border border-gray-300 px-4 py-2 ${order.paid ? 'text-green-600' : 'text-red-600'}`}>
-        {order.paid ? 'YES' : 'NO'}
-      </td>
-      <td className="border border-gray-300 px-4 py-2">
-        <div className="text-sm">{order.name} {order.email}</div>
-        <div className="text-xs">{order.city} {order.postalCode} {order.country}</div>
-        <div className="text-xs">{order.streetAddress}</div>
-      </td>
-      <td className="border border-gray-300 px-4 py-2">
-        {order.line_items.map((l, index) => (
-          <div key={index} className="text-sm">
-            {l.price_data?.product_data.name} x{l.quantity}
-          </div>
-        ))}
-      </td>
-    </tr>
-    ))}
-  </tbody>
-</table> */}
+      
 
 <div className="overflow-x-auto">
   <table className="border-collapse w-full">
