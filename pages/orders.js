@@ -15,6 +15,8 @@ export default function OrdersPage() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [pageNumber, setPageNumber] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   useEffect(() => {
     axios.get('/api/orders').then(response => {
@@ -24,15 +26,31 @@ export default function OrdersPage() {
   }, []);
 
   useEffect(() => {
-    setFilteredOrders(orders.filter(order =>
-      order.line_items.some(item =>
-        item.price_data.product_data.name.toLowerCase().includes(search.toLowerCase())
-      )
-    ));
-  }, [search, orders]);
+    const filtered = orders.filter(order => {
+      const orderDate = new Date(order.createdAt);
+      const from = new Date(fromDate);
+      const to = new Date(toDate);
+      const isWithinDateRange = (!fromDate || orderDate >= from) && (!toDate || orderDate <= to);
+      return (
+        isWithinDateRange &&
+        order.line_items.some(item =>
+          item.price_data.product_data.name.toLowerCase().includes(search.toLowerCase())
+        )
+      );
+    });
+    setFilteredOrders(filtered);
+  }, [search, orders, fromDate, toDate]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
+  };
+
+  const handleFromDateChange = (e) => {
+    setFromDate(e.target.value);
+  };
+
+  const handleToDateChange = (e) => {
+    setToDate(e.target.value);
   };
 
   const handleExport = (format) => {
@@ -57,7 +75,7 @@ export default function OrdersPage() {
       const fileExtension = format === 'csv' ? '.csv' : '.xlsx';
       XLSX.writeFile(wb, `Orders${fileExtension}`);
     } else if (format === 'txt') {
-      const textContent = exportData.map(row =>
+      const textContent = exportData.map(row => 
         Object.values(row).join("\t")
       ).join("\n");
       const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
@@ -114,6 +132,12 @@ export default function OrdersPage() {
     document.body.removeChild(element);
   };
 
+
+  const handleResetDates = () => {
+    setFromDate("");
+    setToDate("");
+  };
+
   return (
     <Layout>
       <h1>Orders</h1>
@@ -136,6 +160,23 @@ export default function OrdersPage() {
           <button onClick={() => handleExport('txt')} className="ml-2 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-2 rounded">
             Export Txt
           </button>
+        </div>
+        <div className=" flex gap-11 justify-center w-1/3" >
+        <input
+          type="date"
+          value={fromDate}
+          onChange={handleFromDateChange}
+          className="border px-2 py-1 rounded ml-2"
+        />
+        <input
+          type="date"
+          value={toDate}
+          onChange={handleToDateChange}
+          className="border px-2 py-1 rounded ml-2"
+        />
+         <button onClick={handleResetDates} className=" w-full ml-2 bg-gray-500 hover:bg-gray-600 text-white font-bold py-1 px-2 rounded">
+          Reset Dates
+        </button>
         </div>
         <select onChange={handleRowsPerPageChange} value={rowsPerPage} className="ml-2 border px-2 py-1 rounded">
           <option value={10}>10 rows</option>
