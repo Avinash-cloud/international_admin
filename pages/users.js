@@ -13,7 +13,7 @@ export default function Products() {
   const [itemsPerPage, setItemsPerPage] = useState(5);
 
   useEffect(() => {
-    axios.get('/api/products').then(response => {
+    axios.get('/api/users').then(response => {
       setProducts(response.data);
     });
   }, []);
@@ -32,7 +32,7 @@ export default function Products() {
   };
 
   const filteredProducts = products.filter(product =>
-    product.title.toLowerCase().includes(searchTerm.toLowerCase())
+    product.firstName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const offset = currentPage * itemsPerPage;
@@ -126,67 +126,49 @@ export default function Products() {
         <thead className="bg-gray-50">
           <tr className="divide-x divide-gray-200">
             <th scope="col" className="border border-gray-300 px-4 py-3.5 text-left text-sm font-medium text-gray-500">
-              <span>SKU ID</span>
+              <span>ID</span>
             </th>
             <th scope="col" className="border border-gray-300 px-4 py-3.5 text-left text-sm font-medium text-gray-500">
-              <span>Image</span>
+              <span>First Name</span>
             </th>
             <th scope="col" className="border border-gray-300 px-12 py-3.5 text-left text-sm font-medium text-gray-500">
-              Title
+            Last Name
             </th>
             <th scope="col" className="border border-gray-300 px-4 py-3.5 text-left text-sm font-medium text-gray-500">
-              Description
+            Email
             </th>
             <th scope="col" className="border border-gray-300 px-4 py-3.5 text-left text-sm font-medium text-gray-500">
-              Stock
+            Phone Number
             </th>
             <th scope="col" className="border border-gray-300 px-4 py-3.5 text-left text-sm font-medium text-gray-500">
-              Price
+            Country
             </th>
             <th scope="col" className="border border-gray-300 px-4 py-3.5 text-left text-sm font-medium text-gray-500">
-              Discounted Price
+            Region
             </th>
-            <th scope="col" className="border border-gray-300 px-4 py-3.5 text-left text-sm font-medium text-gray-500">
-              Actions
-            </th>
+            
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-200 bg-white">
           {currentPageData.map((product) => (
-            <tr key={product.id} className="divide-x divide-gray-200">
-              <td className="whitespace-nowrap px-12 py-4 text-sm text-gray-900">{product.sku}</td>
-              <td className="whitespace-nowrap px-4 py-4">
-                <div className="flex items-center">
-                  <div className="h-16 w-16 flex-shrink-0">
-                    <img
-                      className="h-16 w-16 rounded-full object-cover"
-                      src={product.images[0]}
-                      alt=""
-                    />
-                  </div>
-                  <div className="ml-4">
-                    <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                    <div className="text-sm text-gray-500">{product.email}</div>
-                  </div>
-                </div>
+            <tr key={product._id} className="divide-x divide-gray-200">
+              <td className="whitespace-nowrap px-12 py-4 text-sm text-gray-900">{product._id}</td>
+              <td className="whitespace-nowrap px-12 py-4 text-sm text-gray-900">              
+                    
+                      {product.firstName}                    
+                    
+                  
               </td>
-              <td className="whitespace-nowrap px-12 py-4 text-sm text-gray-900"><a target="_blank" href={`http://www.internationalgift.in/product/${product._id}`}>{product.title}</a></td>
+              <td className="whitespace-nowrap px-12 py-4 text-sm text-gray-900">{product.lastName}</td>
               <td className="px-4 py-4">
-                <div className="text-sm text-gray-500">{product.description}</div>
+                <div className="text-sm text-gray-500">{product.email}</div>
               </td>
               <td className="px-4 py-4">
-                <div className="text-sm text-gray-500">{product.stockQuantity}</div>
+                <div className="text-sm text-gray-500">{product.phoneNumber}</div>
               </td>
-              <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-500">{product.price}</td>
-              <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-500">{product.discountedPrice}</td>
-              <td className="whitespace-nowrap px-4 py-4 text-sm font-medium space-x-2">
-                <Link className="btn-default hover:text-blue-500" href={'/products/edit/' + product._id}>
-                  Edit
-                </Link>
-                <Link className="btn-red hover:text-red-500" href={'/products/delete/' + product._id}>
-                  Delete
-                </Link>
-              </td>
+              <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-500">{product.country}</td>
+              <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-500">{product.region}</td>
+              
             </tr>
           ))}
         </tbody>

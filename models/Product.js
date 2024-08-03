@@ -17,7 +17,7 @@ const ProductSchema = new Schema({
     min: 0
   },
   discountedPrice: {
-    type: Number,
+    type: String,
     min: 0
   },
   images: {
@@ -29,26 +29,8 @@ const ProductSchema = new Schema({
       message: 'Each image URL must be a string'
     }
   },
-  category: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  properties: {
-    color: {
-      type: String,
-      trim: true
-    },
-    weight: {
-      type: Number, // Weight in grams
-      min: 0
-    },
-    dimensions: {
-      length: { type: Number, min: 0 },
-      width: { type: Number, min: 0 },
-      height: { type: Number, min: 0 }
-    }
-  },
+  category: {type:mongoose.Types.ObjectId, ref:'Category'},
+  properties: {type:Object},
   sku: {
     type: String,
     unique: true,
@@ -56,7 +38,7 @@ const ProductSchema = new Schema({
     required: true
   },
   stockQuantity: {
-    type: Number,
+    type: String,
     min: 0,
     default: 0
   },
