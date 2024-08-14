@@ -15,10 +15,14 @@ export default function ProductForm({
   category: assignedCategory,
   properties: assignedProperties,
   sku: existingSku,
+  shortDescriptionPoints: existingShortDescriptionPoints, // New prop for short description points
 }) {
   const [title, setTitle] = useState(existingTitle || "");
   const [stockQuantity, setStockQuantity] = useState(existingStock || "");
   const [description, setDescription] = useState(existingDescription || "");
+  const [shortDescriptionPoints, setShortDescriptionPoints] = useState(
+    existingShortDescriptionPoints || []
+  ); // State for short description points
   const [category, setCategory] = useState(assignedCategory || "");
   const [productProperties, setProductProperties] = useState(
     assignedProperties || {}
@@ -46,6 +50,7 @@ export default function ProductForm({
       title,
       stockQuantity,
       description,
+      shortDescriptionPoints, // Include short description points in the data
       price,
       discountedPrice,
       images,
@@ -94,6 +99,22 @@ export default function ProductForm({
       newProductProps[propName] = value;
       return newProductProps;
     });
+  }
+
+  function addPoint() {
+    setShortDescriptionPoints((prev) => [...prev, ""]);
+  }
+
+  function updatePoint(index, value) {
+    setShortDescriptionPoints((prev) => {
+      const newPoints = [...prev];
+      newPoints[index] = value;
+      return newPoints;
+    });
+  }
+
+  function removePoint(index) {
+    setShortDescriptionPoints((prev) => prev.filter((_, i) => i !== index));
   }
 
   const propertiesToFill = [];
@@ -211,6 +232,34 @@ export default function ProductForm({
         value={description}
         onChange={(ev) => setDescription(ev.target.value)}
       />
+
+      <label>Short Description Points</label>
+      {shortDescriptionPoints.map((point, index) => (
+        <div key={index} className="flex items-center gap-2 mb-2">
+          <input
+            type="text"
+            placeholder="Point"
+            value={point}
+            onChange={(ev) => updatePoint(index, ev.target.value)}
+            className="border p-2 rounded"
+          />
+          <button
+            type="button"
+            onClick={() => removePoint(index)}
+            className="text-red-500"
+          >
+            Remove
+          </button>
+        </div>
+      ))}
+      <div>
+      <button type="button" onClick={addPoint} className="btn-secondary mb-4 btn-primary ">
+        Add Point
+      </button>
+
+      </div>
+      
+
       <label>Price (in USD)</label>
       <input
         type="number"

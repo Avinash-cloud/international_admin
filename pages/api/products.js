@@ -23,7 +23,8 @@ export default async function handle(req, res) {
       category,
       properties,
       stockQuantity,
-      sku
+      sku,
+      shortDescriptionPoints
     } = req.body;
   
     const productDoc = await Product.create({
@@ -35,16 +36,17 @@ export default async function handle(req, res) {
       category,
       properties,
       stockQuantity,
-      sku
+      sku,
+      shortDescriptionPoints
     });
   
     res.json(productDoc);
   }
   
   if (method === 'PUT') {
-    const {title,stockQuantity,description,sku,price,images,category,properties,_id} = req.body;
+    const {title,stockQuantity,description,sku,price,images,category,properties,shortDescriptionPoints,_id} = req.body;
     console.log( req.body)
-    await Product.updateOne({_id}, {title,stockQuantity,description,price,images,category,properties,sku});
+    await Product.updateOne({_id}, {title,stockQuantity,description,price,images,category,properties,sku,shortDescriptionPoints});
     res.json(true);
   }
 

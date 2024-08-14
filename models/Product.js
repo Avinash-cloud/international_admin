@@ -36,6 +36,11 @@ const ProductSchema = new Schema({
     trim: true,
     required: true
   },
+  shortDescriptionPoints:{
+    type: [String], // Array of image URLs
+    
+
+  },
   stockQuantity: {
     type: String,
     min: 0,
